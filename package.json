@@ -1,0 +1,38 @@
+{
+  "name": "sandvik-training-desktop",
+  "version": "1.0.0",
+  "description": "Sandvik technician training quiz library \u2014 standalone Electron app",
+  "main": "main.js",
+  "author": "Jory Dion / UELABS",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable",
+    "test": "node tools/test_smoke.js",
+    "write-config": "python3 tools/write_public_config.py"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "better-sqlite3": "^12.5.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.2",
+    "electron-builder": "^24.7.0",
+    "electron": "^35.7.5"
+  },
+  "build": {
+    "appId": "com.uelabs.sandvik-training",
+    "productName": "Sandvik Training",
+    "files": [
+      "main.js",
+      "preload.js",
+      "app/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "portable",
+      "signAndEditExecutable": false,
+      "forceCodeSigning": false
+    }
+  }
+}
