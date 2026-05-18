@@ -41,6 +41,16 @@
     };
   }
 
+  function hasQuizContent(quizBank) {
+    return Boolean(quizBank && quizBank.sections && quizBank.sections.length && quizBank.stats && quizBank.stats.totalQuestions > 0);
+  }
+
+  async function loadBundledQuizBank() {
+    const response = await fetch('quiz-data/quiz_bank.json');
+    if (!response.ok) throw new Error(`Failed to load bundled quiz bank: ${response.status}`);
+    return response.json();
+  }
+
   function createTrainingClient(options = {}) {
     const config = options.config || (Settings ? Settings.getRuntimeConfig() : {});
     const cache = options.cache || (Cache ? Cache.createCache() : null);
@@ -56,14 +66,21 @@
       const refresh = (async () => {
         const rows = await fetchRows(sb);
         const quizBank = adapter.rowsToQuizBank(rows);
+        if (!hasQuizContent(quizBank)) throw new Error('Remote quiz bank is empty or blocked by RLS');
         if (cache) cache.saveQuizBank(quizBank);
         return quizBank;
       })();
-      if (cached) {
+      if (hasQuizContent(cached)) {
         refresh.catch(() => null);
         return cached;
       }
-      return refresh;
+      try {
+        return await refresh;
+      } catch (_err) {
+        const bundled = await loadBundledQuizBank();
+        if (cache && hasQuizContent(bundled)) cache.saveQuizBank(bundled);
+        return bundled;
+      }
     }
 
     async function getQuizBank() {
@@ -80,5 +97,5 @@
     return { supabase: sb, signInWithOtp, cacheThenSync, getQuizBank, postAttempt, queue, cache };
   }
 
-  return { createTrainingClient, createNoopSupabase, fetchRows };
+  return { createTrainingClient, createNoopSupabase, fetchRows, hasQuizContent, loadBundledQuizBank };
 });

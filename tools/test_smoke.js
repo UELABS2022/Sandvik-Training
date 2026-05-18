@@ -43,6 +43,14 @@ const supabaseClient = fs.readFileSync(path.join(root, 'app/supabase-client.js')
 assert.match(supabaseClient, /signInWithOtp/);
 assert.match(supabaseClient, /getQuizBank/);
 assert.match(supabaseClient, /cacheThenSync/);
+
+const quizBankPath = path.join(root, 'app/quiz-data/quiz_bank.json');
+assert.ok(fs.existsSync(quizBankPath), 'standalone app must ship an offline quiz bank');
+const quizBank = JSON.parse(fs.readFileSync(quizBankPath, 'utf8'));
+assert.equal(quizBank.stats.totalQuestions, 3616, 'offline quiz bank must include all 3,616 questions');
+assert.equal(quizBank.stats.totalQuizSets, 34, 'offline quiz bank must include all 34 quiz sets');
+assert.match(supabaseClient, /loadBundledQuizBank/, 'client must fall back to bundled quiz bank before showing empty data');
+assert.match(supabaseClient, /hasQuizContent/, 'client must not cache/show empty remote rows as valid quiz content');
 const playerHtml = fs.readFileSync(path.join(root, 'app/player.html'), 'utf8');
 assert.doesNotMatch(playerHtml, /\$\{first\.question\}/, 'question text must not be injected through innerHTML templates');
 assert.doesNotMatch(playerHtml, /\$\{first\.answer/, 'answer text must not be injected through innerHTML templates');

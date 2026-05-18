@@ -1,6 +1,6 @@
 {
   "name": "sandvik-training-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sandvik technician training quiz library \u2014 standalone Electron app",
   "main": "main.js",
   "author": "Jory Dion / UELABS",
@@ -33,6 +33,7 @@
       "target": "portable",
       "signAndEditExecutable": false,
       "forceCodeSigning": false
-    }
+    },
+    "artifactName": "Sandvik-Training-Setup-${version}.${ext}"
   }
 }
