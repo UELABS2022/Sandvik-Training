@@ -43,6 +43,10 @@ const supabaseClient = fs.readFileSync(path.join(root, 'app/supabase-client.js')
 assert.match(supabaseClient, /signInWithOtp/);
 assert.match(supabaseClient, /getQuizBank/);
 assert.match(supabaseClient, /cacheThenSync/);
+const playerHtml = fs.readFileSync(path.join(root, 'app/player.html'), 'utf8');
+assert.doesNotMatch(playerHtml, /\$\{first\.question\}/, 'question text must not be injected through innerHTML templates');
+assert.doesNotMatch(playerHtml, /\$\{first\.answer/, 'answer text must not be injected through innerHTML templates');
+assert.match(playerHtml, /textContent=first\.question/, 'question text should render via textContent');
 
 const cache = require(path.join(root, 'app/cache.js'));
 const syncQueue = require(path.join(root, 'app/sync-queue.js'));
